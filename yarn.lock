@@ -913,9 +913,9 @@
     debug "^4.1.1"
 
 "@celo/odis-identifiers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-1.0.0.tgz#9bafbb77d989f1f1064f293a54d64af3298f0e91"
-  integrity sha512-ZcBMGrr+DRX7FqNO0dWZpOVnYi5xWUxGaDtSeWnFQH9JwQ37ZmXQLEyraDXHx3gTgVEl+xSgCfJUnc1+w88PSQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@celo/odis-identifiers/-/odis-identifiers-1.0.1.tgz#f0973ca60c6d0c53b69c9560aa0f9b1878527e8f"
+  integrity sha512-h66DDxfP7p48SCp/hwptuGbJyUm4JvJii1/qEyhgT92WzK3GvDD7hN30mK73c3sUcdUEpaARtHs0lBKeemypcA==
 
 "@celo/typechain-target-web3-v1-celo@^1.0.0":
   version "1.0.0"
