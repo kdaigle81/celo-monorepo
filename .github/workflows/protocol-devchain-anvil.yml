@@ -3,10 +3,12 @@ on:
   push:
     branches:
       - master
+      - 'release/**'
 
 env:
   # Increment these to force cache rebuilding
   FOUNDRY_CACHE_KEY: 1
+  ANVIL_PORT: 8546
 
 jobs:
   build:
@@ -32,16 +34,20 @@ jobs:
           fi
       - name: Foundry cache
         id: foundry-cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./cache
           key: ${{ runner.os }}-foundry-cache-${{ env.FOUNDRY_CACHE_KEY }}
       - name: Foundry out
         id: foundry-out
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./out
           key: ${{ runner.os }}-foundry-out-${{ env.FOUNDRY_CACHE_KEY }}
+
+      - name: Display SHA
+        run: |
+          echo "SHA: ${{ github.sha }}"
 
       - name: Get Pull Request data
         id: get_pr_data
@@ -55,7 +61,7 @@ jobs:
                   repo: context.repo.repo,
                 })
               ).data[0];
-              return result ? { number: result.number } : {};
+              core.setOutput("number", result ? result.number : "");
 
       - name: Set PR Number
         id: set_pr_number
@@ -72,6 +78,8 @@ jobs:
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: "nightly-f625d0fa7c51e65b4bf1e8f7931cd1c6e2e285e9"
 
       - name: Install forge dependencies
         run: forge install
@@ -80,8 +88,16 @@ jobs:
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
 
-      - name: Generate migrations
-        run: ./migrations_sol/run_integration_tests_in_anvil.sh
+      - name: Generate migrations and run devchain
+        if: success() || failure()
+        run: ./scripts/foundry/create_and_migrate_anvil_devchain.sh
+      
+      - name: Run integration tests against local anvil devchain
+        if: success() || failure()
+        run: |
+          forge test -vvv \
+          --match-path "test-sol/integration/*" \
+          --fork-url http://127.0.0.1:${{ env.ANVIL_PORT }}
 
       - name: Sanitize ref name
         id: sanitize-ref-name
